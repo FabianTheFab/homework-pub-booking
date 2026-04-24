@@ -14,21 +14,10 @@ The grader checks for:
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from typing import Any
 
-from sovereign_agent._internal.atomic import atomic_write_text
-from sovereign_agent.errors import IOError as SovereignIOError
-from sovereign_agent.errors import ToolError
 from sovereign_agent.session.directory import Session
 from sovereign_agent.tools.registry import ToolRegistry, ToolResult, _RegisteredTool
-
-from starter.edinburgh_research.integrity import (
-    _TOOL_CALL_LOG,
-    ToolCallRecord,
-    record_tool_call,
-)
 
 _SAMPLE_DATA = Path(__file__).parent / "sample_data"
 
