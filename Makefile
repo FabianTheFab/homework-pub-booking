@@ -63,7 +63,7 @@ help: ## Structured help — your actual starting point
 	@echo '      ${CYAN}make ex7${RESET}                 offline scripted round-trip'
 	@echo '      ${CYAN}make ex7-real${RESET}            real LLM in the loop'
 	@echo ''
-	@echo '  ${GREEN}Ex8${RESET}  — Voice pipeline ${DIM}(bonus)${RESET}'
+	@echo '  ${GREEN}Ex8${RESET}  — Voice pipeline ${DIM}${RESET}'
 	@echo '      ${CYAN}make ex8-text${RESET}            text mode (free, no mic)'
 	@echo '      ${CYAN}make ex8-voice${RESET}           real Speechmatics + Rime (needs setup-voice + mic)'
 	@echo ''

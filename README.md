@@ -20,7 +20,7 @@ By the time you finish:
 - **Ex7** — you wire the round-trip bridge. The loop half and the
   structured half talk across process boundaries via atomic file IPC.
 - **Ex8** — the pub manager calls back. Real voice: Speechmatics for
-  speech-to-text, Rime Arcana for text-to-speech. Bonus.
+  speech-to-text, Rime Arcana for text-to-speech.
 - **Ex9** — reflection questions grounded in YOUR session logs.
 
 If this sounds ambitious, it is. That's the point. Production agent
@@ -258,7 +258,7 @@ Expected narration:
 --:--:--  ↪️   State: structured → complete  (round 2)   ← booked!
 ```
 
-### Ex8 — Voice pipeline (day 4, bonus)
+### Ex8 — Voice pipeline (day 4)
 
 **Setup (if you want voice):**
 

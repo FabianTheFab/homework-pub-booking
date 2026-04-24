@@ -194,7 +194,7 @@ and may or may not accept the booking.
 |---|---|
 | Text mode runs a full 3+ turn conversation | 6 pts |
 | Manager persona stays in character (LLM-as-judge, see §Reasoning) | 4 pts |
-| Voice mode works end-to-end (if attempted and keys are set) | 4 pts bonus (text full-credit possible without this) |
+| Voice mode works end-to-end (if attempted and keys are set) | 4 pts |
 | Every utterance is in the trace with correct event_type | 3 pts |
 | Missing-key graceful degradation | 3 pts |
 
