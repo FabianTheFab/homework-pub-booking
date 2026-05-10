@@ -1,0 +1,53 @@
+{
+  "session_id": "sess_6a8356250748",
+  "version": 1,
+  "created_at": "2026-05-10T20:41:52.498306+00:00",
+  "updated_at": "2026-05-10T20:43:07.195878+00:00",
+  "scenario": "ex7-handoff-bridge",
+  "state": "completed",
+  "user_id": null,
+  "current_half": "loop",
+  "planner": {
+    "subgoals": [
+      {
+        "id": "sg_1",
+        "description": "Call venue_search with near='Old Town', party_size=6, budget_max_gbp=2000; then use the venue_id from the first result to call handoff_to_structured with date='2026-04-25', time='19:30', party_size=6, deposit_gbp=0",
+        "success_criterion": "Venue_search returns a valid venue_id and handoff_to_structured completes successfully",
+        "estimated_tool_calls": 2,
+        "depends_on": [],
+        "assigned_half": "loop",
+        "status": "pending"
+      }
+    ]
+  },
+  "executor": {},
+  "structured": {},
+  "memory": {},
+  "handoff_history": [],
+  "bare_mode": false,
+  "config_overrides": {},
+  "result": {
+    "committed": true,
+    "booking": {
+      "venue_id": "royal_oak",
+      "date": "2026-04-25",
+      "time": "19:30",
+      "party_size": 6,
+      "deposit_gbp": 0,
+      "duration_hours": 3,
+      "catering_tier": "bar_snacks"
+    },
+    "booking_reference": "BK-F3DA6A8C",
+    "rasa_response": [
+      {
+        "recipient_id": "homework-80501441",
+        "text": "Booking confirmed. Reference: BK-F3DA6A8C."
+      },
+      {
+        "recipient_id": "homework-80501441",
+        "text": "Is there anything else I can help you with?"
+      }
+    ]
+  },
+  "resumed_from": null
+}

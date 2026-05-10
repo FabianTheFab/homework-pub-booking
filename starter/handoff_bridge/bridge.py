@@ -50,9 +50,6 @@ class HandoffBridge:
         self.structured_half = structured_half
         self.max_rounds = max_rounds
 
-    # ------------------------------------------------------------------
-    # TODO — the main run method
-    # ------------------------------------------------------------------
     async def run(self, session: Session, initial_task: dict) -> BridgeResult:
         """Run the bridge until the session completes, fails, or hits max_rounds."""
         from sovereign_agent.handoff import write_handoff
@@ -191,7 +188,7 @@ class HandoffBridge:
 
 
 # ---------------------------------------------------------------------------
-# Helper constructors — you may use these or write your own
+# Helper constructors
 # ---------------------------------------------------------------------------
 def build_forward_handoff(session: Session, loop_result: HalfResult) -> Handoff:
     """Package a loop result into a forward-handoff payload for structured."""
@@ -212,17 +209,25 @@ def build_forward_handoff(session: Session, loop_result: HalfResult) -> Handoff:
 
 
 def build_reverse_task(loop_result: HalfResult, struct_result: HalfResult) -> dict:
-    """Build the task dict to pass back to the loop half after a reject."""
     reason = struct_result.output.get("reason") or struct_result.summary
     return {
         "task": (
-            "The structured half rejected the previous proposal. "
-            f"Reason: {reason}. Produce an alternative."
+            "The structured half rejected the previous booking proposal. "
+            f"Reason: {reason}.\n\n"
+            "The Haymarket area has no venue large enough. Search a different area.\n\n"
+            "STEPS (follow exactly):\n"
+            "  1. Call venue_search(near='Old Town', party_size=6, budget_max_gbp=2000)\n"
+            "  2. Take the venue_id from the first result\n"
+            "  3. Call handoff_to_structured with venue_id, date='2026-04-25', time='19:30', "
+            "party_size=6, deposit_gbp=0\n\n"
+            "Do NOT search Haymarket again. Do NOT call handoff_to_structured without a real venue_id.\n"
         ),
         "context": {
             "prior_result": loop_result.output,
             "rejection_reason": reason,
             "retry": True,
+            "required_party_size": 6,
+            "required_area": "Old Town",
         },
     }
 

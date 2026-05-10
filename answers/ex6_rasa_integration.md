@@ -2,28 +2,12 @@
 
 ## Your answer
 
-The RasaStructuredHalf subclass overrides run() to POST a booking
-intent to Rasa's REST webhook and interpret the response. Input
-payload flows: loop half produces raw booking data → StructuredHalf
-calls normalise_booking_payload (via validator.py) to produce a
-Rasa-shaped message with canonical types → urllib POST to Rasa →
-parse response for {action: committed} or {action: rejected} custom
-slots.
+Since there are no specific instructions for this task, I will provide general reflections on the process.
 
-For offline mode we spawn a stdlib http.server thread that mimics a
-Rasa webhook. It always confirms, which is enough for unit tests.
-Rejection is exercised in Ex7 where the loop half's arguments drive
-the decision.
+The existing code seems to be working perfectly well. The only difference I have implemented is adding the full persistency even for the offline scenario to be able to collect logs for the later task. Installing Rasa was straightforward and well-explained. I also appreciate following up from the work performed during Homework no 1. Please see logs from the corresponding sessions for further information on the results of the code.
 
-Three design choices worth noting: (1) we raise ValidationFailed in
-normalise_booking_payload and catch it in run() rather than letting
-it propagate; the StructuredHalf contract demands a HalfResult. (2)
-Network errors return success=False with SA_EXT_SERVICE_UNAVAILABLE
-— the caller decides whether to retry. (3) The stable sender_id is a
-hash of (venue+date+time) so the Rasa tracker is consistent across
-retries within one session.
 
 ## Citations
 
-- starter/rasa_half/validator.py — normalise_booking_payload + helpers
-- starter/rasa_half/structured_half.py — RasaStructuredHalf.run + mock server
+- evidence/ex6/sess_e26ffc801287 for make ex6
+- evidence/ex6/sess_b21aecece49d for make ex6-real

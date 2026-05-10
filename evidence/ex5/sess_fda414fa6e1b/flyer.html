@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Flyer - Haymarket Tap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .flyer {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background: #667eea;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            font-size: 1.1em;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #222;
+            font-weight: 500;
+        }
+
+        .weather-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .cost-highlight {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 1.1em;
+        }
+
+        .total-row {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #667eea;
+            border-top: 2px solid #ddd;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .footer {
+            background: #f9f9f9;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <div class="flyer">
+        <div class="header">
+            <h1 data-testid="venue_name">Haymarket Tap</h1>
+            <p class="subtitle">You're Invited!</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>Event Details</h2>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value" data-testid="date">2026-04-25</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value" data-testid="time">19:30</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Party Size:</span>
+                    <span class="detail-value" data-testid="party_size">6</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Venue</h2>
+                <div class="detail-row">
+                    <span class="detail-label">Location:</span>
+                    <span class="detail-value" data-testid="venue_address">12 Dalry Rd, Edinburgh EH11 2BG</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Weather Forecast</h2>
+                <div class="detail-row">
+                    <span class="detail-label">Conditions:</span>
+                    <span class="weather-badge" data-testid="condition">cloudy</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Temperature:</span>
+                    <span class="detail-value" data-testid="temperature_c">12°C</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Cost Breakdown</h2>
+                <div class="cost-highlight">
+                    <div class="cost-row total-row">
+                        <span>Total Cost:</span>
+                        <span data-testid="total_gbp">£356</span>
+                    </div>
+                    <div class="cost-row">
+                        <span>Deposit Required:</span>
+                        <span data-testid="deposit_required_gbp">£71</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Looking forward to seeing you there!</p>
+        </div>
+    </div>
+</body>
+</html>
