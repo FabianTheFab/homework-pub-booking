@@ -27,6 +27,7 @@ import sys
 
 from sovereign_agent._internal.paths import example_sessions_dir
 from sovereign_agent.session.directory import create_session
+from sovereign_agent.session.state import now_utc
 
 from starter.rasa_half.structured_half import (
     RasaHostLifecycle,
@@ -36,7 +37,9 @@ from starter.rasa_half.structured_half import (
 
 
 async def run_scenario(real: bool, auto: bool) -> int:
-    with example_sessions_dir("ex6-rasa-half", persist=real) as sessions_root:
+    # Ex6 sessions are useful evidence for the structured-half behavior, so
+    # keep mock and real runs discoverable by `make logs` / `make narrate`.
+    with example_sessions_dir("ex6-rasa-half", persist=True) as sessions_root:
         session = create_session(
             scenario="ex6-rasa",
             task="Confirm a booking through the Rasa structured half.",
@@ -44,6 +47,15 @@ async def run_scenario(real: bool, auto: bool) -> int:
         )
         print(f"📂 Session {session.session_id}")
         print(f"   dir: {session.directory}")
+        session.update_state(state="executing", current_half="structured")
+        session.append_trace_event(
+            {
+                "event_type": "structured.session_started",
+                "actor": "ex6",
+                "timestamp": now_utc().isoformat(),
+                "payload": {"mode": "real" if real else "mock", "auto": auto},
+            }
+        )
 
         sample_booking = {
             "data": {
@@ -56,46 +68,76 @@ async def run_scenario(real: bool, auto: bool) -> int:
             }
         }
 
-        if real and auto:
-            # Tier 3 — auto-spawn.
-            log_dir = session.logs_dir / "rasa"
-            log_dir.mkdir(parents=True, exist_ok=True)
-            print(f"   Rasa logs: {log_dir}")
-            print(
-                "   (tier 3 auto-spawn mode — the scenario spawns Rasa + action\n"
-                "    server subprocesses, runs, then tears them down)"
-            )
-            async with RasaHostLifecycle(log_dir=log_dir) as rasa_url:
+        try:
+            if real and auto:
+                # Tier 3 — auto-spawn.
+                log_dir = session.logs_dir / "rasa"
+                log_dir.mkdir(parents=True, exist_ok=True)
+                print(f"   Rasa logs: {log_dir}")
+                print(
+                    "   (tier 3 auto-spawn mode — the scenario spawns Rasa + action\n"
+                    "    server subprocesses, runs, then tears them down)"
+                )
+                async with RasaHostLifecycle(log_dir=log_dir) as rasa_url:
+                    print(f"   Rasa URL: {rasa_url}")
+                    half = RasaStructuredHalf(rasa_url=rasa_url, request_timeout_s=30.0)
+                    result = await half.run(session, sample_booking)
+
+            elif real:
+                # Tier 2 — assume Rasa is already running.
+                print(
+                    "   (tier 2: assuming rasa-actions + rasa-serve are already\n"
+                    "    running in two other terminals. If you see a connection\n"
+                    "    error below, run `make ex6-help` for the setup recipe.)"
+                )
+                rasa_url = "http://localhost:5005/webhooks/rest/webhook"
                 print(f"   Rasa URL: {rasa_url}")
                 half = RasaStructuredHalf(rasa_url=rasa_url, request_timeout_s=30.0)
                 result = await half.run(session, sample_booking)
 
-        elif real:
-            # Tier 2 — assume Rasa is already running.
-            print(
-                "   (tier 2: assuming rasa-actions + rasa-serve are already\n"
-                "    running in two other terminals. If you see a connection\n"
-                "    error below, run `make ex6-help` for the setup recipe.)"
+            else:
+                # Tier 1 — mock.
+                print("   (tier 1: stdlib mock Rasa on :5905 — no license needed)")
+                server, _thread, mock_url = spawn_mock_rasa(port=5905)
+                try:
+                    print(f"   Mock URL: {mock_url}")
+                    half = RasaStructuredHalf(rasa_url=mock_url)
+                    result = await half.run(session, sample_booking)
+                finally:
+                    server.shutdown()
+        except Exception as e:  # noqa: BLE001
+            session.append_trace_event(
+                {
+                    "event_type": "structured.failed",
+                    "actor": "ex6",
+                    "timestamp": now_utc().isoformat(),
+                    "payload": {"error": str(e), "mode": "real" if real else "mock"},
+                }
             )
-            rasa_url = "http://localhost:5005/webhooks/rest/webhook"
-            print(f"   Rasa URL: {rasa_url}")
-            half = RasaStructuredHalf(rasa_url=rasa_url, request_timeout_s=30.0)
-            result = await half.run(session, sample_booking)
-
-        else:
-            # Tier 1 — mock.
-            print("   (tier 1: stdlib mock Rasa on :5905 — no license needed)")
-            server, _thread, mock_url = spawn_mock_rasa(port=5905)
-            try:
-                print(f"   Mock URL: {mock_url}")
-                half = RasaStructuredHalf(rasa_url=mock_url)
-                result = await half.run(session, sample_booking)
-            finally:
-                server.shutdown()
+            session.mark_failed({"error": str(e)})
+            raise
 
         print(f"\nStructured half outcome: {result.next_action}")
         print(f"  summary: {result.summary}")
         print(f"  output:  {result.output}")
+        session.append_trace_event(
+            {
+                "event_type": "structured.completed" if result.success else "structured.rejected",
+                "actor": "ex6",
+                "timestamp": now_utc().isoformat(),
+                "payload": {
+                    "success": result.success,
+                    "next_action": result.next_action,
+                    "summary": result.summary,
+                    "output": result.output,
+                },
+            }
+        )
+
+        if result.success:
+            session.mark_complete(result.output)
+        else:
+            session.mark_failed(result.output)
 
         if real:
             print(f"\n📂 Session artifacts: {session.directory}")

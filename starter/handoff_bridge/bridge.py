@@ -131,6 +131,30 @@ class HandoffBridge:
 
             if struct_result.next_action == "escalate":
                 current_input = build_reverse_task(loop_result, struct_result)
+                reverse_handoff = Handoff(
+                    from_half="structured",
+                    to_half="loop",
+                    written_at=now_utc(),
+                    session_id=session.session_id,
+                    reason=(struct_result.output or {}).get("reason") or struct_result.summary,
+                    context=struct_result.summary,
+                    data=current_input,
+                    return_instructions=(
+                        "Use the rejection reason to produce an alternative venue "
+                        "proposal, then hand off to structured again."
+                    ),
+                )
+                forward_file = session.ipc_dir / "handoff_to_structured.json"
+                if forward_file.exists():
+                    archive = session.handoffs_audit_dir / f"round_{rounds}_forward.json"
+                    archive.parent.mkdir(parents=True, exist_ok=True)
+                    forward_file.rename(archive)
+                write_handoff(session, "loop", reverse_handoff)
+                reverse_file = session.ipc_dir / "handoff_to_loop.json"
+                if reverse_file.exists():
+                    archive = session.handoffs_audit_dir / f"round_{rounds}_reverse.json"
+                    archive.parent.mkdir(parents=True, exist_ok=True)
+                    reverse_file.rename(archive)
                 session.append_trace_event(
                     {
                         "event_type": "session.state_changed",
@@ -144,11 +168,6 @@ class HandoffBridge:
                         },
                     }
                 )
-                forward_file = session.ipc_input_dir / "handoff_to_structured.json"
-                if forward_file.exists():
-                    archive = session.handoffs_audit_dir / f"round_{rounds}_forward.json"
-                    archive.parent.mkdir(parents=True, exist_ok=True)
-                    forward_file.rename(archive)
                 continue
 
             session.mark_failed(

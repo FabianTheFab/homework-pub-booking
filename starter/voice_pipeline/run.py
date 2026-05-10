@@ -19,7 +19,7 @@ async def main_async(voice: bool) -> int:
 
     session = create_session(
         scenario="ex8-voice-pipeline",
-        task="Converse with Alasdair MacLeod (pub manager) to arrange a booking.",
+        task="Converse with John Johnson (pub manager) to arrange a booking.",
         sessions_dir=sessions_root,
     )
     print(f"Session {session.session_id}")

@@ -40,7 +40,7 @@ SILENCE_TIMEOUT_S = 2.0  # consecutive silence to end an utterance
 # ---------------------------------------------------------------------------
 async def run_text_mode(session: Session, persona: ManagerPersona, max_turns: int = 6) -> None:
     """Conversation via stdin/stdout. Same trace-event shape as voice mode."""
-    print("Text mode. Type a message to Alasdair (pub manager); blank line to quit.")
+    print("Text mode. Type a message to John (pub manager); blank line to quit.")
     print(f"Session: {session.session_id}")
     print("-" * 60)
 
@@ -62,7 +62,7 @@ async def run_text_mode(session: Session, persona: ManagerPersona, max_turns: in
         )
 
         manager_text = await persona.respond(user_text)
-        print(f"alasdair> {manager_text}")
+        print(f"john> {manager_text}")
 
         session.append_trace_event(
             {
@@ -188,7 +188,7 @@ async def run_voice_mode(session: Session, persona: ManagerPersona, max_turns: i
 
         # ── get manager reply ──────────────────────────────────────
         manager_text = await persona.respond(user_text)
-        print(f"   alasdair> {manager_text}")
+        print(f"   john> {manager_text}")
 
         session.append_trace_event(
             {
