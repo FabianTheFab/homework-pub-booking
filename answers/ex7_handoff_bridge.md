@@ -8,5 +8,5 @@ The programm required update to run the real version, which is for some reason h
 
 ## Citations
 
-- evidence/ex6/sess_23d7847b6ed4 for make ex7
+- evidence/ex7/sess_23d7847b6ed4 for make ex7
 - evidence/ex7/sess_6a8356250748 for ex7 launched with real parameter

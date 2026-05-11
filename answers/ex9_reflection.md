@@ -1,79 +1,36 @@
 # Ex9 — Reflection
 
-## Q1 — Planner handoff decision
+## Q1 — Handoff decision in Ex7 logs
 
 ### Your answer
 
-In my Ex7 run (session sess_a382a2149fc1), the planner's second
-subgoal was sg_2 "commit the booking under policy rules" with
-assigned_half: "structured". The signal that drove this was the task
-text naming a deterministic constraint — "under policy rules".
-Sovereign-agent's DefaultPlanner is prompted with the list of
-available halves and their purposes; when subgoal description
-mentions rules/policy/limits, the planner prefers structured.
+In both Ex7 sessions the planner never assigned `assigned_half: "structured"` directly — it consistently produced `assigned_half: "loop"`. The handoff was triggered by the executor calling the `handoff_to_structured` tool, which the bridge detected via `loop_result.next_action == "handoff_to_structured"`.
 
-This decision is advisory, not physical. The orchestrator respects
-it only because both halves are wired up. If only a loop half
-existed (as in research_assistant), a subgoal assigned to structured
-would go to the void. That's failure mode #4 from the course slides.
+The clearest evidence is in `sess_23d7847b6ed4` (fake mode). `round_1_forward.json` shows the executor passing `venue_id: "Haymarket Tap"`, `party_size: 12` to the structured half after completing `venue_search`. That tool call was the signal - not a planner decision.
 
-The broader lesson: the planner makes an architectural decision
-based on prose interpretation. Put the rules somewhere the LLM
-cannot mis-assign — in the structured half's Python — and prose
-ambiguity no longer matters.
+This is worth noting because the framework supports two handoff mechanisms: the planner assigning `assigned_half: "structured"`, or the executor calling `handoff_to_structured` mid-execution. Ex7 uses the latter exclusively, seemingly by design.
 
-### Citation
-
-- sessions/sess_a382a2149fc1/logs/tickets/tk_*/raw_output.json
-- sessions/sess_a382a2149fc1/logs/trace.jsonl:23
-
----
-
-## Q2 — Dataflow integrity catch
+## Q2 — Dataflow integrity check in Ex5
 
 ### Your answer
 
-During Ex5 development my integrity check caught a subtle fabrication
-that manual review missed. In session sess_de44a1b8eb12 the flyer
-claimed "Total: £560" and "Deposit: £112" — plausible numbers that
-followed the deposit formula in catering.json. I skimmed and moved on.
+The integrity check did not trigger during the clean run (`sess_fda414fa6e1b`) because all facts in `flyer.html` traced directly to tool outputs in `tool_call_log.json`. The earlier session `sess_5f24ebaf53c4` - run without system prompts - shows what it is designed to catch: the planner went off-plan and the executor invented data rather than calling tools in sequence.
 
-verify_dataflow returned ok=False with unverified_facts=['£560','£112'].
-The trace showed calculate_cost returned total_gbp=540, deposit=0. The
-real total was £540 under the £300 deposit threshold. The LLM had
-written "£560" plausibly — close enough that a human reviewer wouldn't
-notice without cross-referencing.
+A concrete plausible scenario: the LLM calls `get_weather` and receives `temperature_c: 12`, but passes `temperature_c: 14` to `generate_flyer`. A human reviewer looking at a well-formatted flyer showing "14°C" has no reason for suspicion. The integrity check compares every fact in the flyer against `_TOOL_CALL_LOG` entries and flags the discrepancy immediately. This class of quiet substitution is undetectable by manual review but trivially caught by the check.
 
-The check caught it because it compared against ground truth in
-_TOOL_CALL_LOG, not against "does this look reasonable." The lesson
-generalises: if the validator would pass a human skim, plant a
-deliberately-weird value like £9999 and confirm it's caught.
-
-### Citation
-
-- sessions/sess_de44a1b8eb12/workspace/flyer.md:12
-- sessions/sess_de44a1b8eb12/logs/trace.jsonl:15
-
----
-
-## Q3 — Removing one framework primitive
+## Q3 — First production failure
 
 ### Your answer
 
-I'd keep session directories (Decision 1) as the last thing standing
-and rebuild everything else if forced. The forward-only state machine
-(Decision 2) is important but fragile without directories. Tickets
-(Decision 3) I could rebuild as .jsonl files inside the session.
-Atomic-rename IPC (Decision 5) is replaceable by directory polling.
+If the loop produces a valid-looking handoff that Rasa rejects every round, the bridge exhausts `max_rounds=3` and returns `outcome="max_rounds_exceeded"` with `summary="bridge exhausted 3 rounds without resolution"`. The session is marked failed, but the stored result contains no trace of what Rasa's rejection reason was across the rounds. The individual `HalfResult` objects are not persisted, and only the final bridge outcome is written to `session.json`.
 
-Session directories are the irreplaceable piece. Losing them:
-cross-tenant data leaks, reconstructing per-run state from logs,
-"how did this session end up this way" becomes SQL archaeology
-instead of cat. The slides compare it to git commits being the
-foundation — you can rebuild merge, diff, blame from commits but
-not commits from the rest. Session directories are commits.
+This is evidenced by the early real-mode runs before the prompt fixes, where the bridge hit max_rounds with no useful diagnostic. The `round_N_reverse.json` files in `handoffs_audit/` record the rejection reason per round, but only if the bridge actually wrote them, which it does not on the final round before giving up, since there is no further loop to hand back to.
 
-### Citation
+The fix would be for the bridge to write the final structured result to `handoffs_audit/` unconditionally before returning `max_rounds_exceeded`, so post-mortem analysis has the full rejection chain rather than just the outcome string.
 
-- sessions/sess_de44a1b8eb12/ — the directory itself
-- sessions/sess_a382a2149fc1/logs/trace.jsonl
+## Citations
+
+- evidence/ex7/sess_23d7847b6ed4 — round_1_forward.json, round_1_reverse.json
+- evidence/ex7/sess_6a8356250748 — session.json
+- evidence/ex5/sess_fda414fa6e1b — tool_call_log.json, flyer.html
+- evidence/ex5/sess_5f24ebaf53c4 — session.json

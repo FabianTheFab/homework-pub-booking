@@ -1,0 +1,8 @@
+{"event_type": "voice.utterance_in", "actor": "user", "timestamp": "2026-05-11T09:09:21.054749+00:00", "payload": {"text": "Hello .", "turn": 0, "mode": "voice"}}
+{"event_type": "voice.utterance_out", "actor": "manager", "timestamp": "2026-05-11T09:09:21.524122+00:00", "payload": {"text": "What can I do for ye?", "turn": 0, "mode": "voice"}}
+{"event_type": "voice.utterance_in", "actor": "user", "timestamp": "2026-05-11T09:09:31.216734+00:00", "payload": {"text": "Like to make a booking .", "turn": 1, "mode": "voice"}}
+{"event_type": "voice.utterance_out", "actor": "manager", "timestamp": "2026-05-11T09:09:32.924279+00:00", "payload": {"text": "How many in yer party?", "turn": 1, "mode": "voice"}}
+{"event_type": "voice.utterance_in", "actor": "user", "timestamp": "2026-05-11T09:09:41.459581+00:00", "payload": {"text": "Eight .", "turn": 2, "mode": "voice"}}
+{"event_type": "voice.utterance_out", "actor": "manager", "timestamp": "2026-05-11T09:09:42.223016+00:00", "payload": {"text": "Aye, we can do that. I'll pencil you in. What's the date and time?", "turn": 2, "mode": "voice"}}
+{"event_type": "voice.utterance_in", "actor": "user", "timestamp": "2026-05-11T09:09:55.989601+00:00", "payload": {"text": "24th of May . 12:00 .", "turn": 3, "mode": "voice"}}
+{"event_type": "voice.utterance_out", "actor": "manager", "timestamp": "2026-05-11T09:09:57.089046+00:00", "payload": {"text": "Aye, we can do that. I'll pencil you in for 24th May at 12:00. What's the contact number?", "turn": 3, "mode": "voice"}}

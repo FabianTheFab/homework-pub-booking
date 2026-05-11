@@ -31,8 +31,8 @@ from starter.voice_pipeline.manager_persona import ManagerPersona
 SAMPLE_RATE = 16000
 CHANNELS = 1
 SAMPLE_WIDTH = 2  # 16-bit PCM
-MAX_UTTERANCE_S = 15.0  # cap per-turn recording
-SILENCE_TIMEOUT_S = 2.0  # consecutive silence to end an utterance
+MAX_UTTERANCE_S = 30.0  # cap per-turn recording
+SILENCE_TIMEOUT_S = 4.0  # consecutive silence to end an utterance
 
 
 # ---------------------------------------------------------------------------
